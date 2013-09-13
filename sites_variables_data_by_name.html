@@ -20,7 +20,7 @@
         for(var j in data["data_values"][i]["data"]){
           var temp =[]
           if (data["data_values"][i]["data"][j]["time_series_data"].length > 0){
-            $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(new Date(n[0])).getTime()/1000 ,n[1]])}})//convert datetime to unix format and ignore -9999 values
+            $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(Date.parse(n[0])) ,n[1]])}})//convert datetime to unix format and ignore -9999 values
             datasets[data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"]] = {
                           label: data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"],
                           data: temp,
@@ -116,7 +116,7 @@
   						y = item.datapoint[1].toFixed(2);
 
   						showTooltip(item.pageX, item.pageY,
-  						    item.series.label + " of " + new Date(x *1000) + " = " + y);
+  						    item.series.label + " of " + (new Date(x*1)) + " = " + y);
   					}
   				} else {
   					$("#tooltip").remove();
