@@ -14,7 +14,7 @@
    var datasets={};
 	$(function() {
   //Fetch the data from VOEIS    
- $.get("https://voeis.msu.montana.edu/projects/866940cc-1d3a-11e1-b745-6e9ffb75bc80/apivs/get_project_sites_variable_data.json?site_ids[]=1&site_ids[]=2&variable_names[]=Temperature&start_datetime=2006/8/9%2012:23&end_datetime=2011/10/9%2024:00:00&small_data=true&number=10&api_key=3127bbdcda0feba06f0ebd81a1d1953d09072c3add990c75412c4140d56f58f9", function(data){
+ $.get("https://voeis.msu.montana.edu/projects/866940cc-1d3a-11e1-b745-6e9ffb75bc80/apivs/get_project_sites_variable_data.json?site_ids[]=1&site_ids[]=2&variable_names[]=Temperature&variable_names[]=Iron&start_datetime=2006/8/9%2012:23&end_datetime=2011/10/9%2024:00:00&small_data=true&api_key=3127bbdcda0feba06f0ebd81a1d1953d09072c3add990c75412c4140d56f58f9", function(data){
 
       var color = 0
       //iterate through the data and generate a Hash of value readable by Flot - and convert timestamps to Unix time-format
@@ -24,7 +24,17 @@
           if (data["data_values"][i]["data"][j]["time_series_data"].length > 0){//check if there is time-series data
             $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(Date.parse(n[0])) ,n[1]])}})//convert datetime to unix format and ignore -9999 values
             datasets[data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"]] = {
-                          label: data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"],
+                          label: data["data_values"][i]["site"]["name"] + "(" + data["data_values"][i]["data"][j]["variable"]["variable_name"]+")",
+                          data: temp,
+                          color: color
+                        }
+            ++color;
+          }
+        
+          if (data["data_values"][i]["data"][j]["sample_data"].length > 0){//check if there is time-series data
+            $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(Date.parse(n[0])) ,n[1]])}})//convert datetime to unix format and ignore -9999 values
+            datasets[data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"]] = {
+                          label: data["data_values"][i]["site"]["name"] + "(" + data["data_values"][i]["data"][j]["variable"]["variable_name"]+")",
                           data: temp,
                           color: color
                         }
