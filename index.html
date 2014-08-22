@@ -1,0 +1,177 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>VOEIS API Examples: Sites, Variables data by variable name</title>
+	<link href="examples.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="flot/jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="flot/jquery.flot.time.js"></script>
+	<script type="text/javascript">
+   var datas ="";
+   var datasets={};
+	$(function() {
+  //Fetch the data from VOEIS    
+ $.get("https://voeis.msu.montana.edu/projects/866940cc-1d3a-11e1-b745-6e9ffb75bc80/apivs/get_project_sites_variable_data.json?site_ids[]=1&site_ids[]=2&variable_names[]=Temperature&variable_names[]=Iron&start_datetime=2006/8/9%2012:23&end_datetime=2011/10/9%2024:00:00&small_data=true&api_key=3127bbdcda0feba06f0ebd81a1d1953d09072c3add990c75412c4140d56f58f9", function(data){
+
+      var color = 0
+      //iterate through the data and generate a Hash of value readable by Flot - and convert timestamps to Unix time-format
+      for(var i in data["data_values"]){//loop through each site
+        for(var j in data["data_values"][i]["data"]){//loop through each variable in a site
+          var temp =[]
+          if (data["data_values"][i]["data"][j]["time_series_data"].length > 0){//check if there is time-series data
+            $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(Date.parse(n[0])) ,n[1]])}})//convert datetime to unix format and ignore -9999 values
+            datasets[data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"]] = {
+                          label: data["data_values"][i]["site"]["name"] + "(" + data["data_values"][i]["data"][j]["variable"]["variable_name"]+")",
+                          data: temp,
+                          color: color
+                        }
+            ++color;
+          }
+        
+          if (data["data_values"][i]["data"][j]["sample_data"].length > 0){//check if there is time-series data
+            $.map(data["data_values"][i]["data"][j]["time_series_data"], function(n, index){if(n[1] != -9999.0){temp.push([(Date.parse(n[0])) ,n[1]])}})//convert datetime to unix format and ignore -9999 values
+            datasets[data["data_values"][i]["site"]["name"] + ":" + data["data_values"][i]["data"][j]["variable"]["id"]] = {
+                          label: data["data_values"][i]["site"]["name"] + "(" + data["data_values"][i]["data"][j]["variable"]["variable_name"]+")",
+                          data: temp,
+                          color: color
+                        }
+            ++color;
+          }
+        }
+      }
+
+  		// insert checkboxes for series toggling
+  		var choiceContainer = $("#choices");
+  		$.each(datasets, function(key, val) {
+  			choiceContainer.append("<br/><input type='checkbox' name='" + key +
+  				"' checked='checked' id='id" + key + "'></input>" +
+  				"<label for='id" + key + "'>"
+  				+ val.label + "</label>");
+  		});
+
+  		choiceContainer.find("input").click(plotAccordingToChoices);
+
+      //this is the function that graphs the data
+  		function plotAccordingToChoices() {
+
+  			var data = [];
+
+  			choiceContainer.find("input:checked").each(function () {
+  				var key = $(this).attr("name");
+  				if (key && datasets[key]) {
+  					data.push(datasets[key]);
+  				}
+  			});
+
+  			if (data.length > 0) {
+  				$.plot("#placeholder", data, {
+  				  series: {
+            				lines: {
+            					show: true
+            				},
+            				points: {
+            					show: true
+            				},
+            				stack: true
+            			},
+            			grid: {
+                  				hoverable: true,
+                  				clickable: true
+                  			},
+  					yaxis: {
+  						min: 0
+  					},
+  					xaxis: {
+  					  mode: "time",
+  					  timeformat: "%y/%m/%d",
+              twelveHourClock: false
+  					}
+  				});
+  			}
+  		}
+
+  		$('#placeholder').html(""); //clear the placeholder div
+  		plotAccordingToChoices(); //graph the data
+  		
+  		
+  		//add a tooltip for data point hovering
+  		function showTooltip(x, y, contents) {
+  			$("<div id='tooltip'>" + contents + "</div>").css({
+  				position: "absolute",
+  				display: "none",
+  				top: y + 5,
+  				left: x + 5,
+  				border: "1px solid #fdd",
+  				padding: "2px",
+  				"background-color": "#fee",
+  				opacity: 0.80
+  			}).appendTo("body").fadeIn(200);
+  		}
+
+  		var previousPoint = null;
+  		$("#placeholder").bind("plothover", function (event, pos, item) {
+
+  			if ($("#enablePosition:checked").length > 0) {
+  				var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
+  				$("#hoverdata").text(str);
+  			}
+
+  			
+  				if (item) {
+  					if (previousPoint != item.dataIndex) {
+
+  						previousPoint = item.dataIndex;
+
+  						$("#tooltip").remove();
+  						var x = item.datapoint[0].toFixed(2),
+  						y = item.datapoint[1].toFixed(2);
+
+  						showTooltip(item.pageX, item.pageY,
+  						    item.series.label + " of " + (new Date(x*1)) + " = " + y);
+  					}
+  				} else {
+  					$("#tooltip").remove();
+  					previousPoint = null;            
+  				}
+  			
+  		});
+
+      		
+
+  		// Add the Flot version string to the footer
+  		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+  	});
+    })
+
+
+		
+
+	</script>
+	
+</head>
+<body>
+
+	<div id="header">
+		<h2>Temperature Data</h2>
+	</div>
+
+	<div id="content">
+
+		<div class="demo-container" style="width:1000px;">
+			<div id="placeholder" class="demo-placeholder" style="float:left; width:675px;"><h3>Loading Data...</h3></div>
+			<p id="choices" style="float:right; width:250px;"></p>
+		</div>
+
+	
+
+	</div>
+
+	<div id="footer">
+
+	</div>
+
+</body>
+</html>
