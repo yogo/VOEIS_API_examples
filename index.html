@@ -2,7 +2,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Voeis api examples : Examples using the VOEIS API to pull data and display it">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
 	<title>VOEIS API Examples: Sites, Variables data by variable name</title>
 	<link href="examples.css" rel="stylesheet" type="text/css">
 	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
@@ -154,16 +159,37 @@
 </head>
 <body>
 
-	<div id="header">
-		<h2>Temperature Data</h2>
-	</div>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/yogo/VOEIS_API_examples">View on GitHub</a>
 
-	<div id="content">
+          <h1 id="project_title">Voeis api examples</h1>
+          <h2 id="project_tagline">Examples using the VOEIS API to pull data and display it</h2>
 
-		<div class="demo-container" style="width:1000px;">
-			<div id="placeholder" class="demo-placeholder" style="float:left; width:675px;"><h3>Loading Data...</h3></div>
-			<p id="choices" style="float:right; width:250px;"></p>
-		</div>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/yogo/VOEIS_API_examples/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/yogo/VOEIS_API_examples/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      	<div id="header">
+      		<h2>Temperature Data</h2>
+      	</div>
+
+      	<div id="content">
+
+      		<div class="demo-container" style="width:1000px;">
+      			<div id="placeholder" class="demo-placeholder" style="float:left; width:675px;"><h3>Loading Data...</h3></div>
+      			<p id="choices" style="float:right; width:250px;"></p>
+      		</div>
+        </section>
+      </div>
+      
 
 	
 
@@ -174,4 +200,5 @@
 	</div>
 
 </body>
+
 </html>
